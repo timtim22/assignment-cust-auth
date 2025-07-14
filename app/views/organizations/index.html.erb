@@ -1,0 +1,126 @@
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>🏢 Organizations</h1>
+    <% if current_user.has_full_access? %>
+      <%= link_to "Create New Organization", new_organization_path, 
+          style: "background: #1976d2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+    <% end %>
+  </div>
+
+  <!-- User's Current Memberships -->
+  <% if @user_organizations.any? %>
+    <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+      <h3>🎯 Your Organizations</h3>
+      <div style="display: grid; gap: 10px;">
+        <% @user_organizations.each do |organization| %>
+          <div style="background: white; padding: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong><%= link_to organization.name, organization, style: "color: #1976d2; text-decoration: none;" %></strong>
+              <span style="color: #666; margin-left: 10px;">
+                (Role: <%= current_user.user_organizations.find_by(organization: organization).role.titleize %>)
+              </span>
+              <br>
+              <small style="color: #888;">Ages: <%= organization.min_age %>-<%= organization.max_age %></small>
+            </div>
+            <%= link_to "Leave", leave_organization_path(organization), method: :delete, 
+                data: { confirm: "Are you sure you want to leave #{organization.name}?" },
+                style: "background: #d32f2f; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Available Organizations -->
+  <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h3>🌟 Available for Your Age (<%= current_user.age %> years old)</h3>
+    <% if @available_organizations.any? %>
+      <div style="display: grid; gap: 15px;">
+        <% @available_organizations.each do |organization| %>
+          <% unless @user_organizations.include?(organization) %>
+            <div style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #4caf50;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong><%= link_to organization.name, organization, style: "color: #1976d2; text-decoration: none;" %></strong>
+                  <br>
+                  <small style="color: #666;">Ages: <%= organization.min_age %>-<%= organization.max_age %> | Members: <%= organization.users.count %></small>
+                </div>
+                <% if current_user.has_full_access? %>
+                  <%= link_to "Join", join_organization_path(organization), method: :post,
+                      style: "background: #4caf50; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;" %>
+                <% else %>
+                  <span style="background: #ff9800; color: white; padding: 8px 16px; border-radius: 4px; font-size: 12px;">
+                    Consent Required
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p style="color: #666; text-align: center; padding: 20px;">
+        No organizations available for your age group.
+      </p>
+    <% end %>
+  </div>
+
+  <!-- All Organizations -->
+  <div style="background: #f0f0f0; padding: 20px; border-radius: 8px;">
+    <h3>📋 All Organizations</h3>
+    <% if @organizations.any? %>
+      <div style="display: grid; gap: 10px;">
+        <% @organizations.each do |organization| %>
+          <div style="background: white; padding: 15px; border-radius: 5px; 
+               <% if !organization.available_for_user?(current_user) %>opacity: 0.6;<% end %>">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong><%= link_to organization.name, organization, style: "color: #1976d2; text-decoration: none;" %></strong>
+                <% if @user_organizations.include?(organization) %>
+                  <span style="background: #4caf50; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 5px;">
+                    MEMBER
+                  </span>
+                <% end %>
+                <br>
+                <small style="color: #666;">
+                  Ages: <%= organization.min_age %>-<%= organization.max_age %> | 
+                  Members: <%= organization.users.count %> |
+                  <% if organization.available_for_user?(current_user) %>
+                    <span style="color: #4caf50;">✅ Eligible</span>
+                  <% else %>
+                    <span style="color: #f44336;">❌ Not Eligible</span>
+                  <% end %>
+                </small>
+              </div>
+              <% unless @user_organizations.include?(organization) %>
+                <% if organization.available_for_user?(current_user) && current_user.has_full_access? %>
+                  <%= link_to "Join", join_organization_path(organization), method: :post,
+                      style: "background: #1976d2; color: white; padding: 6px 12px; text-decoration: none; border-radius: 3px; font-size: 12px;" %>
+                <% elsif !organization.available_for_user?(current_user) %>
+                  <span style="background: #ccc; color: #666; padding: 6px 12px; border-radius: 3px; font-size: 12px;">
+                    Age Restricted
+                  </span>
+                <% else %>
+                  <span style="background: #ff9800; color: white; padding: 6px 12px; border-radius: 3px; font-size: 12px;">
+                    Consent Required
+                  </span>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p style="color: #666; text-align: center; padding: 40px;">
+        No organizations exist yet. 
+        <% if current_user.has_full_access? %>
+          <%= link_to "Create the first one!", new_organization_path, style: "color: #1976d2;" %>
+        <% end %>
+      </p>
+    <% end %>
+  </div>
+
+  <div style="text-align: center; margin-top: 30px;">
+    <%= link_to "← Back to Home", root_path, style: "color: #666; text-decoration: none;" %>
+  </div>
+</div>

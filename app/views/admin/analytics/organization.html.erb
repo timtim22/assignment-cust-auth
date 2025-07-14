@@ -1,0 +1,212 @@
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>📊 Analytics: <%= @organization.name %></h1>
+    
+    <div style="display: flex; gap: 10px;">
+      <%= link_to "← All Analytics", admin_analytics_path, 
+          style: "background: #1976d2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+      <%= link_to "Organization Page", @organization, 
+          style: "background: #666; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+    </div>
+  </div>
+
+  <!-- Organization Info -->
+  <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3 style="margin: 0 0 10px 0; color: #1976d2;">Organization Details</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+      <div>
+        <strong>Name:</strong> <%= @organization.name %>
+      </div>
+      <div>
+        <strong>Age Range:</strong> <%= @organization.min_age %>-<%= @organization.max_age %> years
+      </div>
+      <div>
+        <strong>Target Groups:</strong> <%= @organization.target_age_groups.join(', ').titleize %>
+      </div>
+      <div>
+        <strong>Created:</strong> <%= @organization.created_at.strftime("%B %d, %Y") %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Metrics -->
+  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <div style="background: #f3e5f5; padding: 20px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #eee;">
+      <h2 style="margin: 0; color: #7b1fa2;">📈 Current Metrics</h2>
+    </div>
+    
+    <div style="padding: 20px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+        <!-- Total Members -->
+        <div style="text-align: center; background: #e3f2fd; padding: 20px; border-radius: 8px;">
+          <h3 style="margin: 0 0 10px 0; color: #1976d2;">👥 Total Members</h3>
+          <p style="font-size: 32px; font-weight: bold; margin: 0;"><%= @organization.users.count %></p>
+        </div>
+        
+        <!-- Admins -->
+        <div style="text-align: center; background: #fff3e0; padding: 20px; border-radius: 8px;">
+          <h3 style="margin: 0 0 10px 0; color: #ff9800;">👑 Admins</h3>
+          <p style="font-size: 32px; font-weight: bold; margin: 0;"><%= @organization.admins.count %></p>
+        </div>
+        
+        <!-- Regular Members -->
+        <div style="text-align: center; background: #e8f5e8; padding: 20px; border-radius: 8px;">
+          <h3 style="margin: 0 0 10px 0; color: #4caf50;">👤 Members</h3>
+          <p style="font-size: 32px; font-weight: bold; margin: 0;"><%= @organization.members.count %></p>
+        </div>
+        
+        <!-- Content -->
+        <div style="text-align: center; background: #f3e5f5; padding: 20px; border-radius: 8px;">
+          <h3 style="margin: 0 0 10px 0; color: #9c27b0;">📝 Content</h3>
+          <p style="font-size: 32px; font-weight: bold; margin: 0;"><%= @organization.contents.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Age Group Breakdown -->
+  <% if @organization.users.any? %>
+    <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+      <div style="background: #e8f5e8; padding: 20px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #eee;">
+        <h2 style="margin: 0; color: #388e3c;">👶🧒👨 Age Group Distribution</h2>
+      </div>
+      
+      <div style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+          <% @organization.users.group(:age_group).count.each do |age_group, count| %>
+            <div style="text-align: center; background: #f5f5f5; padding: 20px; border-radius: 8px;">
+              <h3 style="margin: 0 0 10px 0; color: #666;">
+                <%= case age_group
+                    when 'child'
+                      '👶 Child (0-12)'
+                    when 'teen'
+                      '🧒 Teen (13-17)'
+                    when 'adult'
+                      '👨 Adult (18+)'
+                    else
+                      age_group.titleize
+                    end %>
+              </h3>
+              <p style="font-size: 28px; font-weight: bold; margin: 0; color: #1976d2;"><%= count %></p>
+              <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">
+                <%= number_to_percentage((count.to_f / @organization.users.count * 100), precision: 1) %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Content Breakdown -->
+  <% if @organization.contents.any? %>
+    <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+      <div style="background: #fff3e0; padding: 20px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #eee;">
+        <h2 style="margin: 0; color: #f57c00;">📚 Content by Age Rating</h2>
+      </div>
+      
+      <div style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+          <% @organization.contents.group(:age_rating).count.each do |rating, count| %>
+            <div style="text-align: center; background: #f5f5f5; padding: 20px; border-radius: 8px;">
+              <h3 style="margin: 0 0 10px 0; color: #666;">
+                <%= case rating
+                    when 'child'
+                      '👶 Child Content'
+                    when 'teen'
+                      '🧒 Teen Content'
+                    when 'adult'
+                      '👨 Adult Content'
+                    else
+                      rating.titleize
+                    end %>
+              </h3>
+              <p style="font-size: 28px; font-weight: bold; margin: 0; color: #9c27b0;"><%= count %></p>
+              <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">
+                <%= number_to_percentage((count.to_f / @organization.contents.count * 100), precision: 1) %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Analytics History -->
+  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="background: #ffebee; padding: 20px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #eee;">
+      <h2 style="margin: 0; color: #d32f2f;">📊 Analytics History</h2>
+    </div>
+    
+    <div style="padding: 20px;">
+      <% if @analytics.any? %>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #f5f5f5;">
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Metric</th>
+                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Value</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Recorded At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @analytics.group_by(&:metric_name).each do |metric_name, analytics| %>
+                <% latest_analytic = analytics.first %>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 12px;">
+                    <strong><%= latest_analytic.metric_display_name %></strong>
+                  </td>
+                  <td style="padding: 12px; text-align: center;">
+                    <span style="font-weight: bold; background: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 4px;">
+                      <%= latest_analytic.formatted_value %>
+                    </span>
+                  </td>
+                  <td style="padding: 12px;">
+                    <%= latest_analytic.recorded_at.strftime("%B %d, %Y %I:%M %p") %>
+                    <br>
+                    <small style="color: #666;"><%= time_ago_in_words(latest_analytic.recorded_at) %> ago</small>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <h4 style="color: #666;">Historical Data (Latest 10 Records)</h4>
+          <div style="max-height: 300px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+              <thead>
+                <tr style="background: #f9f9f9;">
+                  <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Time</th>
+                  <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Metric</th>
+                  <th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd;">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @analytics.limit(10).each do |analytic| %>
+                  <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 8px; color: #666;">
+                      <%= analytic.recorded_at.strftime("%m/%d %H:%M") %>
+                    </td>
+                    <td style="padding: 8px;">
+                      <%= analytic.metric_display_name %>
+                    </td>
+                    <td style="padding: 8px; text-align: center;">
+                      <%= analytic.formatted_value %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% else %>
+        <div style="text-align: center; padding: 40px; color: #666;">
+          <h3>No analytics data yet.</h3>
+          <p>Analytics will be recorded as the organization gains activity.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 
