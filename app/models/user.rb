@@ -80,10 +80,14 @@ class User < ApplicationRecord
   private
 
   def set_parental_consent_for_minors
-    if minor?
-      self.parental_consent = false
-    else
-      self.parental_consent = true
+    # Only set parental consent on new records or when date_of_birth changes
+    # This prevents overriding admin-approved consent
+    if new_record? || date_of_birth_changed?
+      if minor?
+        self.parental_consent = false
+      else
+        self.parental_consent = true
+      end
     end
   end
 

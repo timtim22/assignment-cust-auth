@@ -45,7 +45,7 @@
   </div>
   
   <nav>
-    <%= link_to "Sign Out", destroy_user_session_path, method: :delete, data: { confirm: "Are you sure?" } %>
+    <%= link_to "Sign Out", destroy_user_session_path, data: { "turbo-method": :delete, confirm: "Are you sure?" } %>
   </nav>
 <% else %>
   <p>Please sign in to access the application.</p>

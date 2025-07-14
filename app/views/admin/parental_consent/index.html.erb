@@ -71,10 +71,10 @@
                     </span>
                   </td>
                   <td style="padding: 12px; text-align: center;">
-                    <%= link_to "✅ Approve", approve_admin_parental_consent_path(user), 
+                    <%= button_to "✅ Approve", approve_admin_parental_consent_path(user), 
                         method: :patch,
                         data: { confirm: "Approve parental consent for #{user.email}?" },
-                        style: "background: #4caf50; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; margin-right: 5px;" %>
+                        style: "background: #4caf50; color: white; padding: 8px 16px; border: none; border-radius: 4px; margin-right: 5px; cursor: pointer;" %>
                   </td>
                 </tr>
               <% end %>
@@ -137,10 +137,10 @@
                     <% end %>
                   </td>
                   <td style="padding: 12px; text-align: center;">
-                    <%= link_to "🚫 Revoke", revoke_admin_parental_consent_path(user), 
+                    <%= button_to "🚫 Revoke", revoke_admin_parental_consent_path(user), 
                         method: :patch,
                         data: { confirm: "Revoke parental consent for #{user.email}? They will lose access to the application." },
-                        style: "background: #d32f2f; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;" %>
+                        style: "background: #d32f2f; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" %>
                   </td>
                 </tr>
               <% end %>

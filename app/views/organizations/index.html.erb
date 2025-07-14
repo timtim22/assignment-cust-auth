@@ -22,8 +22,8 @@
               <br>
               <small style="color: #888;">Ages: <%= organization.min_age %>-<%= organization.max_age %></small>
             </div>
-            <%= link_to "Leave", leave_organization_path(organization), method: :delete, 
-                data: { confirm: "Are you sure you want to leave #{organization.name}?" },
+            <%= link_to "Leave", leave_organization_path(organization), 
+                data: { "turbo-method": :delete, confirm: "Are you sure you want to leave #{organization.name}?" },
                 style: "background: #d32f2f; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;" %>
           </div>
         <% end %>
@@ -46,7 +46,7 @@
                   <small style="color: #666;">Ages: <%= organization.min_age %>-<%= organization.max_age %> | Members: <%= organization.users.count %></small>
                 </div>
                 <% if current_user.has_full_access? %>
-                  <%= link_to "Join", join_organization_path(organization), method: :post,
+                  <%= link_to "Join", join_organization_path(organization), data: { "turbo-method": :post },
                       style: "background: #4caf50; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;" %>
                 <% else %>
                   <span style="background: #ff9800; color: white; padding: 8px 16px; border-radius: 4px; font-size: 12px;">
@@ -94,7 +94,7 @@
               </div>
               <% unless @user_organizations.include?(organization) %>
                 <% if organization.available_for_user?(current_user) && current_user.has_full_access? %>
-                  <%= link_to "Join", join_organization_path(organization), method: :post,
+                  <%= link_to "Join", join_organization_path(organization), data: { "turbo-method": :post },
                       style: "background: #1976d2; color: white; padding: 6px 12px; text-decoration: none; border-radius: 3px; font-size: 12px;" %>
                 <% elsif !organization.available_for_user?(current_user) %>
                   <span style="background: #ccc; color: #666; padding: 6px 12px; border-radius: 3px; font-size: 12px;">
